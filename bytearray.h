@@ -1,33 +1,34 @@
 /**
  * @file bytearray.h
  * @author mengyou (1523038073@qq.com)
- * @brief C implements bytearray 
- * @version 0.0.1
+ * @brief C implements bytearray
+ * @version 1.0.0
  * @date 2023-02-01
- * 
+ *
  * @copyright Copyright (c) 2023
- * 
+ *
  */
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
+/**
+ * @defgroup bytearray
+ *
+ * @ {
+ */
+
 /// @brief sequence of bytearray
 typedef enum BYTEARRAY_ENDIAN {
-    BYTEARRAY_LITTLEENDIAN,
-    BYTEARRAY_BIGENDIAN,
+    BYTEARRAY_LSB,
+    BYTEARRAY_MSB,
 } BYTEARRAY_ENDIAN;
 
-typedef struct byteArray {
-    uint8_t         *array;
-    size_t           capacity;
-    size_t           len;
-    BYTEARRAY_ENDIAN endian;
-} byteArray, *byteArray_t;
+/// @brief byteArray object
+typedef void *byteArray_t;
 
 /**
  * @brief create a bytearray
@@ -47,18 +48,21 @@ void byteArrayDelete(byteArray_t arr);
 
 /**
  * @brief initialize bytearray with user memory
- * 
+ *
  * @param capacity the capacity of memory
  * @param array ponter of user memory
- * @param length init data length 
+ * @param length init data length
  * @param endian the byte sequence of bytearray
  * @return byteArray_t bytearray object
+ *
+ * @warning this function only copy the memory and set the bytearray's attributes
+ *
  */
 byteArray_t byteArrayAttach(size_t capacity, uint8_t *array, size_t length, BYTEARRAY_ENDIAN endian);
 
 /**
  * @brief uninitialize bytearray create by # byteArrayAttach
- * 
+ *
  * @param arr bytearray object
  */
 void byteArrayDetach(byteArray_t arr);
@@ -220,13 +224,17 @@ bool byteArrayAppendBytes(byteArray_t arr, uint8_t *bytes, size_t length);
 
 /**
  * @brief append a bytearray into the end of the other bytearray
- * 
+ *
  * @param dest destination bytearray object
  * @param src source bytearray object
  * @return true success
  * @return false failed
  */
 bool byteArrayAppendByteArray(byteArray_t dest, byteArray_t src);
+
+/**
+ * @ }
+ */
 
 #ifdef __cplusplus
 }

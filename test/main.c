@@ -1,42 +1,37 @@
-#include <stdlib.h>
-#include <string.h>
 #include "bytearray.h"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-void alog (byteArray_t arr) {
+void alog(byteArray_t arr) {
     if (arr == NULL) {
-        return ;
+        return;
     }
-    printf("\r\n==========================================\r\n");
-    for (size_t i = 0; i< byteArrayGetLength(arr); i++) {
+    printf("\r\n=========================================================================================\r\n");
+    for (size_t i = 0; i < byteArrayGetLength(arr); i++) {
         uint8_t c = 0;
         byteArrayGetByte(arr, i, &c);
         printf("0x%02x ", c);
     }
-    printf("\r\n==========================================\r\n");
+    printf("\r\n=========================================================================================\r\n");
 }
 
 int main() {
-    uint8_t  arr_c[128] = {0};
-    byteArray_t arr2 = byteArrayCreate(4, 1);
-    byteArrayAppendWord(arr2, 0x78654321);
-    byteArray_t arr = byteArrayAttach(128, arr_c, 0, 1);
-    byteArrayAppendWord(arr, 0x12345678);
+    BYTEARRAY_ENDIAN endian = BYTEARRAY_MSB;
+    byteArray_t      arr    = byteArrayCreate(100, endian);
+    const uint32_t   ii     = 0x12345678;
+    byteArray_t      arr2   = byteArrayAttach(sizeof(ii), (uint8_t *)&ii, sizeof(ii), endian);
+    printf("append: %s", byteArrayAppendByte(arr2, 0x00) ? "true" : "false");
+    // byteArrayAttach only copy memory an set attributes
+    // the arr2 on memory is [78563412]  no matter what endian is
+    alog(arr2);
+    byteArrayAppendByte(arr, 0x01);
+    byteArrayAppendByte(arr, 0x02);
+    byteArrayAppendHalfword(arr, 0x1112);
+    byteArrayAppendHalfword(arr, 0x1314);
+    byteArrayAppendWord(arr, 0x21222324);
+    byteArrayAppendWord(arr, 0x25262728);
     byteArrayAppendByteArray(arr, arr2);
-    byteArrayDelete(arr2);
-    printf("capacity: %u, len: %u, addr: %p, %p\n", 
-        byteArrayGetCapacity(arr), byteArrayGetLength(arr), 
-        byteArrayGetDataPointer(arr), arr->array
-    );
     alog(arr);
-    uint16_t h = 0;
-    uint32_t w = 0;
-    uint8_t *a = 0;
-    byteArrayGetHalfword(arr, 0, &h);
-    byteArrayGetWord(arr, 0, &w);
-    byteArrayGetBytes(arr, 0, &a, 4);
-    printf("h: %04x, w: %08x, a:%02x%02x%02x%02x\n", h, w, a[0], a[1], a[2], a[3]);
-    byteArrayDetach(arr);
-    printf("end.\r\n");
     return 0;
 }
